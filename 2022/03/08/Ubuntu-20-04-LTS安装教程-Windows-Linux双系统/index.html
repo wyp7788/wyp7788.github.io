@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Tools," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Linux是一种开放源代码的操作系统，可以安装在服务器、个人计算机，甚至是掌上电脑（PDA）上。Linux因其开源的独特优势，长期以来得到了大量的应用和支持，本文安装的是Ubuntu是一个以桌面应用为主的Linux操作系统。Linux系统主要的特性有：功能强大且稳定（跑深度学习代码稳定很重要）、支持多种平台，多任务多用户！本文中完成了在笔记本电脑或和PC 上安装 Ubuntu Desktop 所需">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ubuntu 20.04 LTS安装教程(Windows-Linux双系统)">
+<meta property="og:url" content="https://wyp7788.github.io/2022/03/08/Ubuntu-20-04-LTS%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B-Windows-Linux%E5%8F%8C%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="Yunpeng&#39;s Blog Space!">
+<meta property="og:description" content="Linux是一种开放源代码的操作系统，可以安装在服务器、个人计算机，甚至是掌上电脑（PDA）上。Linux因其开源的独特优势，长期以来得到了大量的应用和支持，本文安装的是Ubuntu是一个以桌面应用为主的Linux操作系统。Linux系统主要的特性有：功能强大且稳定（跑深度学习代码稳定很重要）、支持多种平台，多任务多用户！本文中完成了在笔记本电脑或和PC 上安装 Ubuntu Desktop 所需">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221121017.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221334908.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221428026.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223148805.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221711117.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221744087.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223356706.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223435183.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223635854.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223700566.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223733158.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223753215.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223835358.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223918019.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223951685.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224034915.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224122463.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224206869.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224229132.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224251093.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224315130.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224336077.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224510082.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224544480.png">
+<meta property="article:published_time" content="2022-03-08T14:07:43.000Z">
+<meta property="article:modified_time" content="2022-07-12T17:50:22.197Z">
+<meta property="article:author" content="Wang Yunpeng">
+<meta property="article:tag" content="Tools">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221121017.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://wyp7788.github.io/2022/03/08/Ubuntu-20-04-LTS安装教程-Windows-Linux双系统/"/>
+
+
+
+
+
+  <title>Ubuntu 20.04 LTS安装教程(Windows-Linux双系统) | Yunpeng's Blog Space!</title>
+  
+
+
+
+
+
+
+
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5205643214793284"
+     crossorigin="anonymous"></script>
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yunpeng's Blog Space!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Do Something Right, do it Better!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wyp7788.github.io/2022/03/08/Ubuntu-20-04-LTS%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B-Windows-Linux%E5%8F%8C%E7%B3%BB%E7%BB%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/taylor.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yunpeng's Blog Space!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ubuntu 20.04 LTS安装教程(Windows-Linux双系统)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-03-08T22:07:43+08:00">
+                2022-03-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  1.4k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  5
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>Linux</strong>是一种开放源代码的操作系统，可以安装在服务器、个人计算机，甚至是掌上电脑（PDA）上。Linux因其开源的独特优势，长期以来得到了大量的应用和支持，本文安装的是Ubuntu是一个以桌面应用为主的Linux操作系统。Linux系统主要的特性有：功能强大且稳定（跑深度学习代码稳定很重要）、支持多种平台，多任务多用户！本文中完成了在笔记本电脑或和PC 上安装 <strong>Ubuntu Desktop</strong> 所需的步骤，也算是安装Ubuntu过程的一个记录。</p>
+<h2 id="1-安装之前的准备工作">1. 安装之前的准备工作</h2>
+<ul>
+<li>
+<p>一个U盘：至少8GB，推荐12G以上（格式化为NTFS较为方便）</p>
+</li>
+<li>
+<p>下载Ubuntu镜像文件，官方网址为：<a target="_blank" rel="noopener" href="https://ubuntu.com/download/desktop">https://ubuntu.com/download/desktop</a></p>
+<p>这里要说一下，官网提供两个版本，一个是<strong>Ubuntu xx.xx.x LTS</strong> ，LTS是<strong>Long-term Support</strong>也就是长期支持维护的意思，也就是说 2025 年 4 月之前的几年内，会维持免费的安全和维护更新。另一个版本21.10 提供9个月的安全和维护更新。这里建议下载Ubuntu 20.04.3 LTS版本。</p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221121017.png" alt="image-20220524221121017" style="zoom: 33%;" />
+</li>
+</ul>
+<p>有的软件环境指定特定版本的Ubuntu（比如最新的vivado开发套件仅支持到Ubuntu20.04.2LTS） 这个时候就需要在官网仔细寻找一番了，这里贴出官网上之前版本Ubuntu的网址https://releases.ubuntu.com/?_ga=2.179257892.1442709334.1653368937-1391585154.1648825070 ，下图是其网页内容，根据自己的需要下载特定版本的Ubuntu镜像文件，后缀名为.iso。还有就是在版本选择的时候，amd64和因特尔x64是一回事，不用纠结</p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221334908.png" alt="image-20220524221334908" style="zoom:33%;" />
+<ul>
+<li>用U盘创建一个启动盘</li>
+</ul>
+<p>要安装 Ubuntu Desktop系统，需要将下载的 ISO系统镜像 写入 U 盘以创建安装媒介。这和简单的复制 ISO文件 不同，需要一些定制软件。在本文中，使用 的工具软件是balenaEtcher，因为它可以在 Linux、Windows 和 Mac OS 上运行。选择与自己当前操作系统对应的版本，下载并安装该工具。官网为：<a target="_blank" rel="noopener" href="https://www.balena.io/etcher/">https://www.balena.io/etcher/</a></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221428026.png" alt="image-20220524221428026" style="zoom:50%;" />
+<p><strong>也可根据自己的系统选择下载的版本：</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223148805.png" alt="image-20220524223148805" style="zoom:50%;" />
+<h2 id="2-安装过程">2.安装过程</h2>
+<h3 id="2-1-将Ubuntu-iso文件写入U盘作为启动盘">2.1 将Ubuntu iso文件写入U盘作为启动盘</h3>
+<p><strong>（1）打开安装好的工具软件balenaEtcher，会出现以下界面，点击点击Flash from file.</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221711117.png" alt="image-20220524221711117" style="zoom:50%;" />
+<p><strong>选择下载的Ubuntu iso镜像文件</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524221744087.png" alt="image-20220524221744087" style="zoom:50%;" />
+<p><strong>（2）点击<code>Select target</code>选择要写入的磁盘，记住要选择自己的U盘</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223356706.png" alt="image-20220524223356706" style="zoom:50%;" />
+<p><strong>系统盘出现了黄色感叹号图标，切记不要选择系统盘！</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223435183.png" alt="image-20220524223435183" style="zoom:50%;" />
+<p><strong>（3）点击<code>Flash</code>，会出现以下界面</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223635854.png" alt="image-20220524223635854" style="zoom:50%;" />
+<p><strong>下图是flash完成时候的画面</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223700566.png" alt="image-20220524223700566" style="zoom:50%;" />
+<h3 id="2-2-为电脑硬盘创建空白分区（安装win-linux双系统的话建议不要略过）">2.2 为电脑硬盘创建空白分区（安装win-linux双系统的话建议不要略过）</h3>
+<p>官网没有这一步，其实可以省去，但是为了不改变windows的分区大小，尤其是装双系统的话还是强烈建议为电脑硬件创建空白分区</p>
+<p>步骤为：点击电脑–&gt;右键–&gt;管理（G）–&gt;磁盘管理–&gt;点击D盘，右键压缩卷，如图</p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223733158.png" alt="image-20220524223733158" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223753215.png" alt="image-20220524223753215" style="zoom: 80%;" />
+<p><strong>输入压缩空间量就是你想要为Linux系统创建磁盘的大小，根据自己的需要选择大小（比如100G，数值就是100*1024MB）</strong></p>
+<h3 id="2-3-设置电脑为U盘启动">2.3 设置电脑为U盘启动</h3>
+<p>在电脑上插入2.1做好的启动盘，然后重启电脑进入BIOS，进入BIOS的方法不同品牌的计算机有细微差别，这点自行百度，华硕的笔记本是开始时候不停的按F2，华硕主板是不停的按Del删除键。进入BIOS之后设置电脑的启动方式为U盘启动，保存退出之后就会进入安装Ubuntu界面。</p>
+<h3 id="2-4-Ubuntu安装界面及其初始化设置过程">2.4 Ubuntu安装界面及其初始化设置过程</h3>
+<p><strong>第 2.3 节执行完就会进入下面的界面，</strong></p>
+<p><strong>step 1 ：默认选择英文，点击Install Ubuntu</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223835358.png" alt="image-20220524223835358" style="zoom: 80%;" />
+<p>推荐选择英文，中文语言的话或许会有一些潜在的兼容性问题。</p>
+<p><strong>step 2：按照下图选择Normal installation、Download updates while installing Ubuntu、Install third-party … formats， 然后点击下方continue</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223918019.png" alt="image-20220524223918019" style="zoom: 80%;" />
+<p>在笔记本上安装的时候，也会出现让设置root密码（台式机的root密码可以在安装好系统之后在命令行里面设置）如下图</p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524223951685.png" alt="image-20220524223951685" style="zoom:50%;" />
+<p><strong>step 3：安装位置选择，如果是默认下图的选项的话，会保留电脑上原来的windows系统，也就是说安装完之后是双系统，安装的时候Ubuntu默认装在咱们最开始为磁盘创立的空白分区上面；选择好之后，点击右下方Install Now</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224034915.png" alt="image-20220524224034915" style="zoom: 80%;" />
+<p><strong>然后会出现下图的情况，点击Continue即可</strong></p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224122463.png" alt="image-20220524224122463" style="zoom:80%;" />
+<p><strong>step 4：选择位置，这个根据自己的地区选择，但中国的好像是落在了上海，只能选上海</strong></p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224206869.png" alt="image-20220524224206869"></p>
+<p><strong>step 5：创建用户信息及密码，信息填完之后点击右下方continue</strong></p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224229132.png" alt="image-20220524224229132"></p>
+<p><strong>step 6：静等安装完成</strong></p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224251093.png" alt="image-20220524224251093"></p>
+<p><strong>step 7：完成安装之后，会弹出重启的提示信息，点击Restart Now</strong></p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224315130.png" alt="image-20220524224315130"></p>
+<p>按着下图的提示，拔下来安装媒介U盘，然后按 <strong>ENTER</strong> 键，等待开机</p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224336077.png" alt="image-20220524224336077"></p>
+<p><strong>step 8：输入登录密码，点击ENTER即可进入桌面界面</strong></p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224510082.png" alt="image-20220524224510082"></p>
+<p>下图就是安装好的Ubuntu系统了！<strong>至此安装完成</strong></p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/image-20220524224544480.png" alt="image-20220524224544480"></p>
+<p><strong>关于Ubuntu的使用网上的教程非常多，这里就不赘述了！本文基本是按官网给出的提示一步一步的完成Ubuntu系统的安装，并且在台式机和笔记本都成功的完成了Ubuntu的安装。</strong>【官网的教程是最靠谱的参考资料】</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Tools/" rel="tag"># Tools</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/01/06/Verilog-%E6%95%B0%E5%AD%97%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1/" rel="next" title="Verilog 数字模块设计">
+                <i class="fa fa-chevron-left"></i> Verilog 数字模块设计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/03/11/%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%8A%A0%E6%B3%95%E5%99%A8/" rel="prev" title="流水线加法器">
+                流水线加法器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/taylor.jpg"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/wyp7788" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:ypwang0905@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.youtube.com/channel/UCdppnvLpN_BCR-ogLoUf9qQ" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/ypwang090509" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%AE%89%E8%A3%85%E4%B9%8B%E5%89%8D%E7%9A%84%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">1. 安装之前的准备工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">2.安装过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%B0%86Ubuntu-iso%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5U%E7%9B%98%E4%BD%9C%E4%B8%BA%E5%90%AF%E5%8A%A8%E7%9B%98"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 将Ubuntu iso文件写入U盘作为启动盘</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E4%B8%BA%E7%94%B5%E8%84%91%E7%A1%AC%E7%9B%98%E5%88%9B%E5%BB%BA%E7%A9%BA%E7%99%BD%E5%88%86%E5%8C%BA%EF%BC%88%E5%AE%89%E8%A3%85win-linux%E5%8F%8C%E7%B3%BB%E7%BB%9F%E7%9A%84%E8%AF%9D%E5%BB%BA%E8%AE%AE%E4%B8%8D%E8%A6%81%E7%95%A5%E8%BF%87%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 为电脑硬盘创建空白分区（安装win-linux双系统的话建议不要略过）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E8%AE%BE%E7%BD%AE%E7%94%B5%E8%84%91%E4%B8%BAU%E7%9B%98%E5%90%AF%E5%8A%A8"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 设置电脑为U盘启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-Ubuntu%E5%AE%89%E8%A3%85%E7%95%8C%E9%9D%A2%E5%8F%8A%E5%85%B6%E5%88%9D%E5%A7%8B%E5%8C%96%E8%AE%BE%E7%BD%AE%E8%BF%87%E7%A8%8B"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 Ubuntu安装界面及其初始化设置过程</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yunpeng</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">8.8k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+

@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="FPGA," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="VGA（Video Graphics Array接口是IBM制定的一种视频数据的传输标准，一种电脑显示器的典型接 口。VGA接口输出的是模拟图像。传统CRT显示器使用的是VGA接口，现在也有不少的液晶显示器或投 影仪也支持VGA接口。 ##1. VGA接口外观和引脚  VGA接口是15pin的梯形插头，分成三排，每排五个，接口信号主要有五个：  R（Red） G（Green） B（Blue） HS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VGA显示驱动设计">
+<meta property="og:url" content="https://wyp7788.github.io/2022/03/22/VGA%E6%98%BE%E7%A4%BA%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="Yunpeng&#39;s Blog Space!">
+<meta property="og:description" content="VGA（Video Graphics Array接口是IBM制定的一种视频数据的传输标准，一种电脑显示器的典型接 口。VGA接口输出的是模拟图像。传统CRT显示器使用的是VGA接口，现在也有不少的液晶显示器或投 影仪也支持VGA接口。 ##1. VGA接口外观和引脚  VGA接口是15pin的梯形插头，分成三排，每排五个，接口信号主要有五个：  R（Red） G（Green） B（Blue） HS">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/VGA_if_a">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/scan">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/bank">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/VGA_parameters">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/ADV7123">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/baock">
+<meta property="article:published_time" content="2022-03-22T04:38:27.000Z">
+<meta property="article:modified_time" content="2022-08-03T09:31:54.833Z">
+<meta property="article:author" content="Wang Yunpeng">
+<meta property="article:tag" content="FPGA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/VGA_if_a">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://wyp7788.github.io/2022/03/22/VGA显示驱动设计/"/>
+
+
+
+
+
+  <title>VGA显示驱动设计 | Yunpeng's Blog Space!</title>
+  
+
+
+
+
+
+
+
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5205643214793284"
+     crossorigin="anonymous"></script>
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yunpeng's Blog Space!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Do Something Right, do it Better!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wyp7788.github.io/2022/03/22/VGA%E6%98%BE%E7%A4%BA%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/taylor.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yunpeng's Blog Space!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">VGA显示驱动设计</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-03-22T12:38:27+08:00">
+                2022-03-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  1.3k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  5
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>VGA（Video Graphics Array</strong>接口是IBM制定的一种视频数据的传输标准，一种电脑显示器的典型接 口。VGA接口输出的是模拟图像。传统CRT显示器使用的是VGA接口，现在也有不少的液晶显示器或投 影仪也支持VGA接口。</p>
+<p>##1. VGA接口外观和引脚</p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/VGA_if_a" alt=""></p>
+<p>VGA接口是15pin的梯形插头，分成三排，每排五个，接口信号主要有五个：</p>
+<ul>
+<li>R（Red）</li>
+<li>G（Green）</li>
+<li>B（Blue）</li>
+<li>HS（Horizontal Synchronization）</li>
+<li>VS（Vertical Synchronization）<br>
+<strong>Note：VS和HS又称为帧同步（场同步）和行同步</strong></li>
+</ul>
+<h3 id="2-VGA工作原理">2. VGA工作原理</h3>
+<p>图像的显示是以像素点为单位，标准的VGA分辨率是640x480，也有更高的分辨率如1024x768、1280x1024、1920x1200等，VGA显示器的一般刷新率为60Hz。每一帧图像的显示都是从屏幕左上角开始一行一行进行，行同步信号是一个负脉冲，行同步信号有效后，由RGB端输出到当前行显示各像素点的RGB电压值，当一帧显示结束后，由帧同步信号发送一个负脉冲，重新开始从屏幕的左上角开始显示下一帧图像。</p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/scan" alt="image-20220712194620746"></p>
+<p>由于CRT显示器是靠电子管发射的电子显示信息，因此CRT的电子束从一行的行尾到下一行的行头需要时间、电子束从屏幕的右下角回到左上角开始下一帧也需要时间。这些时间成为电子束的行消隐时间和场消隐时间，行消隐时间以像素为单位，帧消隐时间以行为单位；电子束处于消隐时间时，RGB端输出的电压为0，屏幕此时显示的是黑色。 VGA行扫描、场扫描时序示意图如下：</p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/bank" alt="image-20220712194652584"></p>
+<p>由上图可知，在标准的 640×480 的VGA上有效地显示一行信号需要96+48+640+16=800个像素点的时间，其中行同步负脉冲宽度为96个像素点时间，行消隐后沿需要48个像素点时间，然后每行显示640个像素点，最后行消隐前沿需要16个像素点的时间。所以一行中显示像素的时间为640个像素点时间，一行消隐时间为160个像素点时间。在标准的 640×480 的VGA上有效显示一帧图像需 2+33+480+10=525行时间，其中场同步负脉冲宽度为2个行显示时间，场消隐后沿需要33个行显示时间，然后每场显示480行，场消隐前沿需要10个行显示时间，一帧显示时间为525行显示时间，一帧消隐时间为45行显示时间。因此，在 640×480 的VGA上的一幅图像需要 525×800=420k 个像素点的时间。而每秒扫描60帧共需要约25M个像素点的时间。</p>
+<h3 id="2-1-不同分辨率下的VGA参数：">2.1 不同分辨率下的VGA参数：</h3>
+<p>以分辨率<code>1280*1024</code>、60 FPS为例，此分辨率下的时钟频率</p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/VGA_parameters" alt="image-20220712195234933"></p>
+<p>##3. VGA显示的实现</p>
+<p>VGA DAC ADV7123芯片完成数字信号到VGA模拟信号的转换，该芯片是三路高速、10bit输入的视频DA转换器，最大采样速度330M Hz（330 MSPS：330 Million Samples per Second），与多种高精度的显示系统兼容，可以广泛应用于HDTV、数字视频系统（1600*1200@100Hz）、高分辨率彩色图像处理、视频信号再现等。FPGA和ADV7123芯片之间的接口引脚包括3组 8bit 的颜色信号；</p>
+<h3 id="3-1-ADV7123-芯片">3.1 ADV7123 芯片</h3>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/ADV7123" alt="image-20220712194816678" style="zoom:50%;" />
+<p>主要引脚功能描述：</p>
+<p>芯片与FPGA连接参考：</p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/baock" alt="image-20220712194924198"></p>
+<p><strong>FPGA开发板和ADV7123芯片之间的接口引脚包括3组8bit的颜色信号VGA_R[7:0], VGA_G[7:0],VGA_B[7:0]，行同步信号VGA_HS，帧同步信号VGA_VS，VGA时钟信号VGA_CLK，VGA同步（低有效）VGA_SYNC_N, 和VGA消隐信号（低有效）VGA_BLANK_N</strong></p>
+<p>Verilog实现VGA显示：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> vga_ctrl(</span><br><span class="line">    <span class="keyword">input</span>           pclk,     <span class="comment">//25MHz时钟</span></span><br><span class="line">    <span class="keyword">input</span>           reset,    <span class="comment">//置位</span></span><br><span class="line">    <span class="keyword">input</span>  [<span class="number">23</span>:<span class="number">0</span>]   vga_data, <span class="comment">//上层模块提供的VGA颜色数据</span></span><br><span class="line">    <span class="keyword">output</span> [<span class="number">9</span>:<span class="number">0</span>]    h_addr,   <span class="comment">//提供给上层模块的当前扫描像素点坐标</span></span><br><span class="line">    <span class="keyword">output</span> [<span class="number">9</span>:<span class="number">0</span>]    v_addr,</span><br><span class="line">    <span class="keyword">output</span>          hsync,    <span class="comment">//行同步和列同步信号</span></span><br><span class="line">    <span class="keyword">output</span>          vsync,</span><br><span class="line">    <span class="keyword">output</span>          valid,    <span class="comment">//消隐信号</span></span><br><span class="line">    <span class="keyword">output</span> [<span class="number">7</span>:<span class="number">0</span>]    vga_r,    <span class="comment">//红绿蓝颜色信号</span></span><br><span class="line">    <span class="keyword">output</span> [<span class="number">7</span>:<span class="number">0</span>]    vga_g,</span><br><span class="line">    <span class="keyword">output</span> [<span class="number">7</span>:<span class="number">0</span>]    vga_b</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">  <span class="comment">//640x480分辨率下的VGA参数设置</span></span><br><span class="line">  <span class="keyword">parameter</span>    h_frontporch = <span class="number">96</span>;</span><br><span class="line">  <span class="keyword">parameter</span>    h_active = <span class="number">144</span>;</span><br><span class="line">  <span class="keyword">parameter</span>    h_backporch = <span class="number">784</span>;</span><br><span class="line">  <span class="keyword">parameter</span>    h_total = <span class="number">800</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">parameter</span>    v_frontporch = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">parameter</span>    v_active = <span class="number">35</span>;</span><br><span class="line">  <span class="keyword">parameter</span>    v_backporch = <span class="number">515</span>;</span><br><span class="line">  <span class="keyword">parameter</span>    v_total = <span class="number">525</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//像素计数值</span></span><br><span class="line">  <span class="keyword">reg</span> [<span class="number">9</span>:<span class="number">0</span>]    x_cnt;</span><br><span class="line">  <span class="keyword">reg</span> [<span class="number">9</span>:<span class="number">0</span>]    y_cnt;</span><br><span class="line">  <span class="keyword">wire</span>         h_valid;</span><br><span class="line">  <span class="keyword">wire</span>         v_valid;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">always</span> @(<span class="keyword">posedge</span> reset <span class="keyword">or</span> <span class="keyword">posedge</span> pclk) <span class="comment">//行像素计数</span></span><br><span class="line">      <span class="keyword">if</span> (reset == <span class="number">1&#x27;b1</span>)</span><br><span class="line">        x_cnt &lt;= <span class="number">1</span>;</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">      <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span> (x_cnt == h_total)</span><br><span class="line">            x_cnt &lt;= <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            x_cnt &lt;= x_cnt + <span class="number">10&#x27;d1</span>;</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">always</span> @(<span class="keyword">posedge</span> pclk)  <span class="comment">//列像素计数</span></span><br><span class="line">      <span class="keyword">if</span> (reset == <span class="number">1&#x27;b1</span>)</span><br><span class="line">        y_cnt &lt;= <span class="number">1</span>;</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">      <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span> (y_cnt == v_total &amp; x_cnt == h_total)</span><br><span class="line">            y_cnt &lt;= <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (x_cnt == h_total)</span><br><span class="line">            y_cnt &lt;= y_cnt + <span class="number">10&#x27;d1</span>;</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">  <span class="comment">//生成同步信号</span></span><br><span class="line">  <span class="keyword">assign</span> hsync = (x_cnt &gt; h_frontporch);</span><br><span class="line">  <span class="keyword">assign</span> vsync = (y_cnt &gt; v_frontporch);</span><br><span class="line">  <span class="comment">//生成消隐信号</span></span><br><span class="line">  <span class="keyword">assign</span> h_valid = (x_cnt &gt; h_active) &amp; (x_cnt &lt;= h_backporch);</span><br><span class="line">  <span class="keyword">assign</span> v_valid = (y_cnt &gt; v_active) &amp; (y_cnt &lt;= v_backporch);</span><br><span class="line">  <span class="keyword">assign</span> valid = h_valid &amp; v_valid;</span><br><span class="line">  <span class="comment">//计算当前有效像素坐标</span></span><br><span class="line">  <span class="keyword">assign</span> h_addr = h_valid ? (x_cnt - <span class="number">10&#x27;d145</span>) : &#123;<span class="number">10</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;;</span><br><span class="line">  <span class="keyword">assign</span> v_addr = v_valid ? (y_cnt - <span class="number">10&#x27;d36</span>) : &#123;<span class="number">10</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;;</span><br><span class="line">  <span class="comment">//设置输出的颜色值</span></span><br><span class="line">  <span class="keyword">assign</span> vga_r = vga_data[<span class="number">23</span>:<span class="number">16</span>];</span><br><span class="line">  <span class="keyword">assign</span> vga_g = vga_data[<span class="number">15</span>:<span class="number">8</span>];</span><br><span class="line">  <span class="keyword">assign</span> vga_b = vga_data[<span class="number">7</span>:<span class="number">0</span>];</span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FPGA/" rel="tag"># FPGA</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/03/18/FPGA%E5%AE%9E%E7%8E%B0%E5%9B%BE%E5%83%8F%E7%9B%B4%E6%96%B9%E5%9B%BE%E5%9D%87%E8%A1%A1%E5%8C%96/" rel="next" title="FPGA实现图像直方图均衡化">
+                <i class="fa fa-chevron-left"></i> FPGA实现图像直方图均衡化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/03/27/TLK-1501-datasheet-%E7%A0%94%E8%AF%BB/" rel="prev" title="TLK 1501 datasheet 研读">
+                TLK 1501 datasheet 研读 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/taylor.jpg"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/wyp7788" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:ypwang0905@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.youtube.com/channel/UCdppnvLpN_BCR-ogLoUf9qQ" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/ypwang090509" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-VGA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">2. VGA工作原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%8D%E5%90%8C%E5%88%86%E8%BE%A8%E7%8E%87%E4%B8%8B%E7%9A%84VGA%E5%8F%82%E6%95%B0%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">2.1 不同分辨率下的VGA参数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-ADV7123-%E8%8A%AF%E7%89%87"><span class="nav-number">3.</span> <span class="nav-text">3.1 ADV7123 芯片</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yunpeng</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">8.8k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+

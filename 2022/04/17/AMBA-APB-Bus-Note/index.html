@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="AMBA," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="AMBA 总线是ARM推出的高级微控制器总线架构 1. APB总线协议概述 APB协议是低成本接口，为低功耗优化，降低了接口复杂性。APB协议不支持流水线，它是一个简单的同步总线协议。每次数据传输至少需要两个时钟周期。 APB协议的设计是用来访问外围设备的可编程控制寄存器， 2. AMBA APB Signals 部分APB的信号接口位宽是可变的，部分信号接口可以使用不同的位宽，当位宽不可变时，就">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AMBA: APB Bus Note">
+<meta property="og:url" content="https://wyp7788.github.io/2022/04/17/AMBA-APB-Bus-Note/index.html">
+<meta property="og:site_name" content="Yunpeng&#39;s Blog Space!">
+<meta property="og:description" content="AMBA 总线是ARM推出的高级微控制器总线架构 1. APB总线协议概述 APB协议是低成本接口，为低功耗优化，降低了接口复杂性。APB协议不支持流水线，它是一个简单的同步总线协议。每次数据传输至少需要两个时钟周期。 APB协议的设计是用来访问外围设备的可编程控制寄存器， 2. AMBA APB Signals 部分APB的信号接口位宽是可变的，部分信号接口可以使用不同的位宽，当位宽不可变时，就">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/APB_01">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/FSM_APB">
+<meta property="article:published_time" content="2022-04-17T09:36:43.000Z">
+<meta property="article:modified_time" content="2022-07-27T10:10:21.116Z">
+<meta property="article:author" content="Wang Yunpeng">
+<meta property="article:tag" content="AMBA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/APB_01">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://wyp7788.github.io/2022/04/17/AMBA-APB-Bus-Note/"/>
+
+
+
+
+
+  <title>AMBA: APB Bus Note | Yunpeng's Blog Space!</title>
+  
+
+
+
+
+
+
+
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5205643214793284"
+     crossorigin="anonymous"></script>
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yunpeng's Blog Space!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Do Something Right, do it Better!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wyp7788.github.io/2022/04/17/AMBA-APB-Bus-Note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/taylor.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yunpeng's Blog Space!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">AMBA: APB Bus Note</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-04-17T17:36:43+08:00">
+                2022-04-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  680
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>AMBA 总线是ARM推出的高级微控制器总线架构</p>
+<h2 id="1-APB总线协议概述">1. APB总线协议概述</h2>
+<p>APB协议是低成本接口，为低功耗优化，降低了接口复杂性。APB协议不支持流水线，它是一个简单的同步总线协议。每次数据传输至少需要两个时钟周期。</p>
+<p>APB协议的设计是用来访问外围设备的可编程控制寄存器，</p>
+<h2 id="2-AMBA-APB-Signals">2. AMBA APB Signals</h2>
+<p>部分APB的信号接口位宽是可变的，部分信号接口可以使用不同的位宽，当位宽不可变时，就是要使用某种特性。如果特征接口的值为0，意味着信号不会出现在接口上。</p>
+<p>下表描述了APB协议的接口信号</p>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Source</th>
+<th>Width</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PCLK</td>
+<td>Clock</td>
+<td>1</td>
+<td>时钟信号，所有的APB信号接口均在PCLK的上升沿有效</td>
+</tr>
+<tr>
+<td>PRESETn</td>
+<td>系统总线复位</td>
+<td>1</td>
+<td>低电平有效的复位信号，正常情况下直接连接系统总线复位信号</td>
+</tr>
+<tr>
+<td>PADDR</td>
+<td>请求者</td>
+<td>地址宽度</td>
+<td>地址总线，位宽最高可达32bits</td>
+</tr>
+<tr>
+<td>PPROT</td>
+<td>请求者</td>
+<td>3</td>
+<td>保护类型</td>
+</tr>
+<tr>
+<td>PSELx</td>
+<td>请求者</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td>PENABLE</td>
+<td>请求者</td>
+<td>1</td>
+<td>使能信号，描述第二个和随后APB传输时钟</td>
+</tr>
+<tr>
+<td>PWRITE</td>
+<td>请求者</td>
+<td>1</td>
+<td>方向，拉高时写使能，拉低时读使能</td>
+</tr>
+<tr>
+<td>PWDATA</td>
+<td>请求者</td>
+<td>数据位宽</td>
+<td>写数据，写数据总线总过APB桥驱动，可以为8，16，32位宽</td>
+</tr>
+<tr>
+<td>PSTRB</td>
+<td>请求者</td>
+<td>数据位宽/8</td>
+<td></td>
+</tr>
+<tr>
+<td>PREADY</td>
+<td>Completer</td>
+<td>1</td>
+<td>握手信号</td>
+</tr>
+<tr>
+<td>PRDATA</td>
+<td>Completer</td>
+<td>DATA_WIDTH</td>
+<td>读数据，数据位宽可以为：8，16，32</td>
+</tr>
+<tr>
+<td>PSLAVERR</td>
+<td>Completer</td>
+<td>1</td>
+<td>传输错误信号，可选的信号，高电平触发，表示传输过程中发生一次错误</td>
+</tr>
+<tr>
+<td>PWAKEUP</td>
+<td>请求者</td>
+<td>1</td>
+<td>唤醒</td>
+</tr>
+<tr>
+<td>PAUSER</td>
+<td>请求者</td>
+<td>用户定义宽度</td>
+<td>用户请求属性</td>
+</tr>
+<tr>
+<td>PWUSER</td>
+<td>请求者</td>
+<td>用户数据宽度</td>
+<td>用户写数据属性</td>
+</tr>
+<tr>
+<td>PRUSER</td>
+<td>Completer</td>
+<td>用户数据宽度</td>
+<td>用户读数据属性</td>
+</tr>
+<tr>
+<td>PBUSER</td>
+<td>Completer</td>
+<td>用户定义宽度</td>
+<td>用户相应属性（最大推荐位宽16bit）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-1-地址总线">2.1 地址总线</h3>
+<h3 id="2-2-数据总线">2.2 数据总线</h3>
+<p>APB协议有两个独立的数据总线：</p>
+<ul>
+<li>读数据总线</li>
+<li>写数据总线</li>
+</ul>
+<p>数据总线可以配置位8，16，32位宽，读数据总线与写数据总线的位宽必须保持一致。</p>
+<p>由于读、写数据总线没有独立的握手信号，所以读数据和写数据不能同时进行。</p>
+<h2 id="3-数据传输">3. 数据传输</h2>
+<h3 id="3-1-写数据传输">3.1 写数据传输</h3>
+<p>本节讨论两种类型的写数据传输：</p>
+<ul>
+<li>无等待状态传输</li>
+<li>有等待状态传输</li>
+</ul>
+<p>所有的信号均是在<strong>PCLK</strong>的上升沿采样！</p>
+<p>####3.1.1 无等待状态</p>
+<p>无等待状态传输的时序图如下：</p>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/APB_01" alt="image-20220717190716590" style="zoom: 50%;" />
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/FSM_APB" alt="image-20220717203759986" style="zoom:50%;" />
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/AMBA/" rel="tag"># AMBA</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/03/27/TLK-1501-datasheet-%E7%A0%94%E8%AF%BB/" rel="next" title="TLK 1501 datasheet 研读">
+                <i class="fa fa-chevron-left"></i> TLK 1501 datasheet 研读
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/taylor.jpg"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/wyp7788" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:ypwang0905@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.youtube.com/channel/UCdppnvLpN_BCR-ogLoUf9qQ" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/ypwang090509" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-APB%E6%80%BB%E7%BA%BF%E5%8D%8F%E8%AE%AE%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">1. APB总线协议概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-AMBA-APB-Signals"><span class="nav-number">2.</span> <span class="nav-text">2. AMBA APB Signals</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%9C%B0%E5%9D%80%E6%80%BB%E7%BA%BF"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 地址总线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%95%B0%E6%8D%AE%E6%80%BB%E7%BA%BF"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 数据总线</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="nav-number">3.</span> <span class="nav-text">3. 数据传输</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%86%99%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 写数据传输</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yunpeng</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">8.8k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+

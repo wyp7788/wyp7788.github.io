@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="FPGA," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1. 图像中值滤波 中值滤波是一种统计排序（非线性）的信号处理方法，最初由 J.W.Tukey 于1971年提出，并应用于一维信号处理，后来被应用于二维图像处理领域。 复杂背景下，红外目标进行精确有效的识别和跟踪是一个难题，这种情况下，由于目标与背景的对比度较小、信噪比较低。若直接进行识别和跟踪往往比较困难，因此会对图像信号进行滤波预处理。滤波可以有效的抑制背景噪声，增加目标强度，从而提高图像信噪">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FPGA实现图像中值滤波">
+<meta property="og:url" content="https://wyp7788.github.io/2022/03/15/FPGA%E5%AE%9E%E7%8E%B0%E5%9B%BE%E5%83%8F%E4%B8%AD%E5%80%BC%E6%BB%A4%E6%B3%A2/index.html">
+<meta property="og:site_name" content="Yunpeng&#39;s Blog Space!">
+<meta property="og:description" content="1. 图像中值滤波 中值滤波是一种统计排序（非线性）的信号处理方法，最初由 J.W.Tukey 于1971年提出，并应用于一维信号处理，后来被应用于二维图像处理领域。 复杂背景下，红外目标进行精确有效的识别和跟踪是一个难题，这种情况下，由于目标与背景的对比度较小、信噪比较低。若直接进行识别和跟踪往往比较困难，因此会对图像信号进行滤波预处理。滤波可以有效的抑制背景噪声，增加目标强度，从而提高图像信噪">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/FPGA_filter_01">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/FPGA_filter_02">
+<meta property="og:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/FPGA_filter_03">
+<meta property="article:published_time" content="2022-03-15T08:51:52.000Z">
+<meta property="article:modified_time" content="2022-07-12T15:13:42.871Z">
+<meta property="article:author" content="Wang Yunpeng">
+<meta property="article:tag" content="FPGA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/FPGA_filter_01">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://wyp7788.github.io/2022/03/15/FPGA实现图像中值滤波/"/>
+
+
+
+
+
+  <title>FPGA实现图像中值滤波 | Yunpeng's Blog Space!</title>
+  
+
+
+
+
+
+
+
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5205643214793284"
+     crossorigin="anonymous"></script>
+<meta name="generator" content="Hexo 6.2.0"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yunpeng's Blog Space!</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Do Something Right, do it Better!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://wyp7788.github.io/2022/03/15/FPGA%E5%AE%9E%E7%8E%B0%E5%9B%BE%E5%83%8F%E4%B8%AD%E5%80%BC%E6%BB%A4%E6%B3%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/taylor.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yunpeng's Blog Space!">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">FPGA实现图像中值滤波</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-03-15T16:51:52+08:00">
+                2022-03-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  2.8k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  16
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-图像中值滤波">1. 图像中值滤波</h2>
+<p>中值滤波是一种统计排序（非线性）的信号处理方法，最初由 <strong>J.W.Tukey</strong> 于1971年提出，并应用于一维信号处理，后来被应用于二维图像处理领域。</p>
+<p>复杂背景下，红外目标进行精确有效的识别和跟踪是一个难题，这种情况下，由于目标与背景的对比度较小、信噪比较低。若直接进行识别和跟踪往往比较困难，因此会对图像信号进行滤波预处理。滤波可以有效的抑制背景噪声，增加目标强度，从而提高图像信噪比。</p>
+<p>实时图像处理中，实时预处理包括对图像的各种滤波、直方图统计及均衡、图像增强、灰度变换等，他们共同的特点就是处理的数据量特别大</p>
+<h3 id="1-1-中值滤波基本思想">1.1 中值滤波基本思想</h3>
+<p>用局部领域像素灰度值排序后的中值代替当前像素的灰度值：</p>
+<p><mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -1.552ex;" xmlns="http://www.w3.org/2000/svg" width="40.242ex" height="4.652ex" role="img" focusable="false" viewBox="0 -1370 17787.1 2056"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D454" d="M311 43Q296 30 267 15T206 0Q143 0 105 45T66 160Q66 265 143 353T314 442Q361 442 401 394L404 398Q406 401 409 404T418 412T431 419T447 422Q461 422 470 413T480 394Q480 379 423 152T363 -80Q345 -134 286 -169T151 -205Q10 -205 10 -137Q10 -111 28 -91T74 -71Q89 -71 102 -80T116 -111Q116 -121 114 -130T107 -144T99 -154T92 -162L90 -164H91Q101 -167 151 -167Q189 -167 211 -155Q234 -144 254 -122T282 -75Q288 -56 298 -13Q311 35 311 43ZM384 328L380 339Q377 350 375 354T369 368T359 382T346 393T328 402T306 405Q262 405 221 352Q191 313 171 233T151 117Q151 38 213 38Q269 38 323 108L331 118L384 328Z"></path></g><g data-mml-node="mo" transform="translate(477,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(866,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(1438,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(1882.7,0)"><path data-c="1D466" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(2372.7,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(3039.4,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mfrac" transform="translate(4095.2,0)"><g data-mml-node="mrow" transform="translate(220,676)"><g data-mml-node="mi"><path data-c="1D440" d="M289 629Q289 635 232 637Q208 637 201 638T194 648Q194 649 196 659Q197 662 198 666T199 671T201 676T203 679T207 681T212 683T220 683T232 684Q238 684 262 684T307 683Q386 683 398 683T414 678Q415 674 451 396L487 117L510 154Q534 190 574 254T662 394Q837 673 839 675Q840 676 842 678T846 681L852 683H948Q965 683 988 683T1017 684Q1051 684 1051 673Q1051 668 1048 656T1045 643Q1041 637 1008 637Q968 636 957 634T939 623Q936 618 867 340T797 59Q797 55 798 54T805 50T822 48T855 46H886Q892 37 892 35Q892 19 885 5Q880 0 869 0Q864 0 828 1T736 2Q675 2 644 2T609 1Q592 1 592 11Q592 13 594 25Q598 41 602 43T625 46Q652 46 685 49Q699 52 704 61Q706 65 742 207T813 490T848 631L654 322Q458 10 453 5Q451 4 449 3Q444 0 433 0Q418 0 415 7Q413 11 374 317L335 624L267 354Q200 88 200 79Q206 46 272 46H282Q288 41 289 37T286 19Q282 3 278 1Q274 0 267 0Q265 0 255 0T221 1T157 2Q127 2 95 1T58 0Q43 0 39 2T35 11Q35 13 38 25T43 40Q45 46 65 46Q135 46 154 86Q158 92 223 354T289 629Z"></path></g><g data-mml-node="mi" transform="translate(1051,0)"><path data-c="1D452" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path></g><g data-mml-node="mi" transform="translate(1517,0)"><path data-c="1D451" d="M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g><g data-mml-node="mi" transform="translate(2037,0)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mi" transform="translate(2382,0)"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mi" transform="translate(2911,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g><g data-mml-node="mi" transform="translate(1600.5,-686)"><path data-c="1D434" d="M208 74Q208 50 254 46Q272 46 272 35Q272 34 270 22Q267 8 264 4T251 0Q249 0 239 0T205 1T141 2Q70 2 50 0H42Q35 7 35 11Q37 38 48 46H62Q132 49 164 96Q170 102 345 401T523 704Q530 716 547 716H555H572Q578 707 578 706L606 383Q634 60 636 57Q641 46 701 46Q726 46 726 36Q726 34 723 22Q720 7 718 4T704 0Q701 0 690 0T651 1T578 2Q484 2 455 0H443Q437 6 437 9T439 27Q443 40 445 43L449 46H469Q523 49 533 63L521 213H283L249 155Q208 86 208 74ZM516 260Q516 271 504 416T490 562L463 519Q447 492 400 412L310 260L413 259Q516 259 516 260Z"></path></g><rect width="3711" height="60" x="120" y="220"></rect></g><g data-mml-node="TeXAtom" data-mjx-texclass="ORD" transform="translate(8046.2,0)"><g data-mml-node="mi"><path data-c="1D453" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g><g data-mml-node="mo" transform="translate(550,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(939,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(1733.2,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mi" transform="translate(2733.4,0)"><path data-c="1D458" d="M121 647Q121 657 125 670T137 683Q138 683 209 688T282 694Q294 694 294 686Q294 679 244 477Q194 279 194 272Q213 282 223 291Q247 309 292 354T362 415Q402 442 438 442Q468 442 485 423T503 369Q503 344 496 327T477 302T456 291T438 288Q418 288 406 299T394 328Q394 353 410 369T442 390L458 393Q446 405 434 405H430Q398 402 367 380T294 316T228 255Q230 254 243 252T267 246T293 238T320 224T342 206T359 180T365 147Q365 130 360 106T354 66Q354 26 381 26Q429 26 459 145Q461 153 479 153H483Q499 153 499 144Q499 139 496 130Q455 -11 378 -11Q333 -11 305 15T277 90Q277 108 280 121T283 145Q283 167 269 183T234 206T200 217T182 220H180Q168 178 159 139T145 81T136 44T129 20T122 7T111 -2Q98 -11 83 -11Q66 -11 57 -1T48 16Q48 26 85 176T158 471L195 616Q196 629 188 632T149 637H144Q134 637 131 637T124 640T121 647Z"></path></g><g data-mml-node="mo" transform="translate(3254.4,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(3699.1,0)"><path data-c="1D466" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(4411.3,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mi" transform="translate(5411.6,0)"><path data-c="1D459" d="M117 59Q117 26 142 26Q179 26 205 131Q211 151 215 152Q217 153 225 153H229Q238 153 241 153T246 151T248 144Q247 138 245 128T234 90T214 43T183 6T137 -11Q101 -11 70 11T38 85Q38 97 39 102L104 360Q167 615 167 623Q167 626 166 628T162 632T157 634T149 635T141 636T132 637T122 637Q112 637 109 637T101 638T95 641T94 647Q94 649 96 661Q101 680 107 682T179 688Q194 689 213 690T243 693T254 694Q266 694 266 686Q266 675 193 386T118 83Q118 81 118 75T117 65V59Z"></path></g><g data-mml-node="mo" transform="translate(5709.6,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mo" transform="translate(6098.6,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mo" transform="translate(6543.2,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(6932.2,0)"><path data-c="1D458" d="M121 647Q121 657 125 670T137 683Q138 683 209 688T282 694Q294 694 294 686Q294 679 244 477Q194 279 194 272Q213 282 223 291Q247 309 292 354T362 415Q402 442 438 442Q468 442 485 423T503 369Q503 344 496 327T477 302T456 291T438 288Q418 288 406 299T394 328Q394 353 410 369T442 390L458 393Q446 405 434 405H430Q398 402 367 380T294 316T228 255Q230 254 243 252T267 246T293 238T320 224T342 206T359 180T365 147Q365 130 360 106T354 66Q354 26 381 26Q429 26 459 145Q461 153 479 153H483Q499 153 499 144Q499 139 496 130Q455 -11 378 -11Q333 -11 305 15T277 90Q277 108 280 121T283 145Q283 167 269 183T234 206T200 217T182 220H180Q168 178 159 139T145 81T136 44T129 20T122 7T111 -2Q98 -11 83 -11Q66 -11 57 -1T48 16Q48 26 85 176T158 471L195 616Q196 629 188 632T149 637H144Q134 637 131 637T124 640T121 647Z"></path></g><g data-mml-node="mo" transform="translate(7453.2,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(7897.9,0)"><path data-c="1D459" d="M117 59Q117 26 142 26Q179 26 205 131Q211 151 215 152Q217 153 225 153H229Q238 153 241 153T246 151T248 144Q247 138 245 128T234 90T214 43T183 6T137 -11Q101 -11 70 11T38 85Q38 97 39 102L104 360Q167 615 167 623Q167 626 166 628T162 632T157 634T149 635T141 636T132 637T122 637Q112 637 109 637T101 638T95 641T94 647Q94 649 96 661Q101 680 107 682T179 688Q194 689 213 690T243 693T254 694Q266 694 266 686Q266 675 193 386T118 83Q118 81 118 75T117 65V59Z"></path></g><g data-mml-node="mo" transform="translate(8195.9,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mi" transform="translate(8584.9,0)"><path data-c="1D716" d="M227 -11Q149 -11 95 41T40 174Q40 262 87 322Q121 367 173 396T287 430Q289 431 329 431H367Q382 426 382 411Q382 385 341 385H325H312Q191 385 154 277L150 265H327Q340 256 340 246Q340 228 320 219H138V217Q128 187 128 143Q128 77 160 52T231 26Q258 26 284 36T326 57T343 68Q350 68 354 58T358 39Q358 36 357 35Q354 31 337 21T289 0T227 -11Z"></path></g><g data-mml-node="mi" transform="translate(8990.9,0)"><path data-c="1D434" d="M208 74Q208 50 254 46Q272 46 272 35Q272 34 270 22Q267 8 264 4T251 0Q249 0 239 0T205 1T141 2Q70 2 50 0H42Q35 7 35 11Q37 38 48 46H62Q132 49 164 96Q170 102 345 401T523 704Q530 716 547 716H555H572Q578 707 578 706L606 383Q634 60 636 57Q641 46 701 46Q726 46 726 36Q726 34 723 22Q720 7 718 4T704 0Q701 0 690 0T651 1T578 2Q484 2 455 0H443Q437 6 437 9T439 27Q443 40 445 43L449 46H469Q523 49 533 63L521 213H283L249 155Q208 86 208 74ZM516 260Q516 271 504 416T490 562L463 519Q447 492 400 412L310 260L413 259Q516 259 516 260Z"></path></g></g></g></g></svg></mjx-container></p>
+<p><strong>其中：</strong></p>
+<p><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="116.789ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 51620.8 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D453" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g><g data-mml-node="mo" transform="translate(550,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(939,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(1511,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(1955.7,0)"><path data-c="1D466" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(2445.7,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mi" transform="translate(2834.7,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">是</text></g><g data-mml-node="mi" transform="translate(3834.7,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">原</text></g><g data-mml-node="mi" transform="translate(4834.7,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">始</text></g><g data-mml-node="mi" transform="translate(5834.7,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">图</text></g><g data-mml-node="mi" transform="translate(6834.7,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">像</text></g><g data-mml-node="mi" transform="translate(7834.7,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">阵</text></g><g data-mml-node="mi" transform="translate(8834.7,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">列</text></g><g data-mml-node="mi" transform="translate(9834.7,0)"><text data-variant="italic" transform="scale(1,-1)" font-size="884px" font-family="serif" font-style="italic">，</text></g><g data-mml-node="mi" transform="translate(10834.7,0)"><path data-c="1D454" d="M311 43Q296 30 267 15T206 0Q143 0 105 45T66 160Q66 265 143 353T314 442Q361 442 401 394L404 398Q406 401 409 404T418 412T431 419T447 422Q461 422 470 413T480 394Q480 379 423 152T363 -80Q345 -134 286 -169T151 -205Q10 -205 10 -137Q10 -111 28 -91T74 -71Q89 -71 102 -80T116 -111Q116 -121 114 -130T107 -144T99 -154T92 -162L90 -164H91Q101 -167 151 -167Q189 -167 211 -155Q234 -144 254 -122T282 -75Q288 -56 298 -13Q311 35 311 43ZM384 328L380 339Q377 350 375 354T369 368T359 382T346 393T328 402T306 405Q262 405 221 352Q191 313 171 233T151 117Q151 38 213 38Q269 38 323 108L331 118L384 328Z"></path></g><g data-mml-node="mo" transform="translate(11311.7,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(11700.7,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(12272.7,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="mi" transform="translate(12717.3,0)"><path data-c="1D466" d="M21 287Q21 301 36 335T84 406T158 442Q199 442 224 419T250 355Q248 336 247 334Q247 331 231 288T198 191T182 105Q182 62 196 45T238 27Q261 27 281 38T312 61T339 94Q339 95 344 114T358 173T377 247Q415 397 419 404Q432 431 462 431Q475 431 483 424T494 412T496 403Q496 390 447 193T391 -23Q363 -106 294 -155T156 -205Q111 -205 77 -183T43 -117Q43 -95 50 -80T69 -58T89 -48T106 -45Q150 -45 150 -87Q150 -107 138 -122T115 -142T102 -147L99 -148Q101 -153 118 -160T152 -167H160Q177 -167 186 -165Q219 -156 247 -127T290 -65T313 -9T321 21L315 17Q309 13 296 6T270 -6Q250 -11 231 -11Q185 -11 150 11T104 82Q103 89 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(13207.3,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g><g data-mml-node="mi" transform="translate(13596.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">是</text></g><g data-mml-node="mi" transform="translate(14596.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">中</text></g><g data-mml-node="mi" transform="translate(15596.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">值</text></g><g data-mml-node="mi" transform="translate(16596.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">滤</text></g><g data-mml-node="mi" transform="translate(17596.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">波</text></g><g data-mml-node="mi" transform="translate(18596.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">后</text></g><g data-mml-node="mi" transform="translate(19596.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">图</text></g><g data-mml-node="mi" transform="translate(20596.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">像</text></g><g data-mml-node="mi" transform="translate(21596.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">阵</text></g><g data-mml-node="mi" transform="translate(22596.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">列</text></g><g data-mml-node="mi" transform="translate(23596.3,0)"><text data-variant="italic" transform="scale(1,-1)" font-size="884px" font-family="serif" font-style="italic">，</text></g><g data-mml-node="mi" transform="translate(24596.3,0)"><path data-c="1D440" d="M289 629Q289 635 232 637Q208 637 201 638T194 648Q194 649 196 659Q197 662 198 666T199 671T201 676T203 679T207 681T212 683T220 683T232 684Q238 684 262 684T307 683Q386 683 398 683T414 678Q415 674 451 396L487 117L510 154Q534 190 574 254T662 394Q837 673 839 675Q840 676 842 678T846 681L852 683H948Q965 683 988 683T1017 684Q1051 684 1051 673Q1051 668 1048 656T1045 643Q1041 637 1008 637Q968 636 957 634T939 623Q936 618 867 340T797 59Q797 55 798 54T805 50T822 48T855 46H886Q892 37 892 35Q892 19 885 5Q880 0 869 0Q864 0 828 1T736 2Q675 2 644 2T609 1Q592 1 592 11Q592 13 594 25Q598 41 602 43T625 46Q652 46 685 49Q699 52 704 61Q706 65 742 207T813 490T848 631L654 322Q458 10 453 5Q451 4 449 3Q444 0 433 0Q418 0 415 7Q413 11 374 317L335 624L267 354Q200 88 200 79Q206 46 272 46H282Q288 41 289 37T286 19Q282 3 278 1Q274 0 267 0Q265 0 255 0T221 1T157 2Q127 2 95 1T58 0Q43 0 39 2T35 11Q35 13 38 25T43 40Q45 46 65 46Q135 46 154 86Q158 92 223 354T289 629Z"></path></g><g data-mml-node="mi" transform="translate(25647.3,0)"><path data-c="1D452" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path></g><g data-mml-node="mi" transform="translate(26113.3,0)"><path data-c="1D451" d="M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g><g data-mml-node="mi" transform="translate(26633.3,0)"><path data-c="1D456" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mi" transform="translate(26978.3,0)"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mi" transform="translate(27507.3,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mi" transform="translate(28107.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">为</text></g><g data-mml-node="mi" transform="translate(29107.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">中</text></g><g data-mml-node="mi" transform="translate(30107.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">值</text></g><g data-mml-node="mi" transform="translate(31107.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">滤</text></g><g data-mml-node="mi" transform="translate(32107.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">波</text></g><g data-mml-node="mi" transform="translate(33107.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">算</text></g><g data-mml-node="mi" transform="translate(34107.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">子</text></g><g data-mml-node="mi" transform="translate(35107.3,0)"><text data-variant="italic" transform="scale(1,-1)" font-size="884px" font-family="serif" font-style="italic">，</text></g><g data-mml-node="mi" transform="translate(36107.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">取</text></g><g data-mml-node="mi" transform="translate(37107.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">中</text></g><g data-mml-node="mi" transform="translate(38107.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">值</text></g><g data-mml-node="mi" transform="translate(39107.3,0)"><text data-variant="italic" transform="scale(1,-1)" font-size="884px" font-family="serif" font-style="italic">，</text></g><g data-mml-node="mi" transform="translate(40107.3,0)"><path data-c="1D434" d="M208 74Q208 50 254 46Q272 46 272 35Q272 34 270 22Q267 8 264 4T251 0Q249 0 239 0T205 1T141 2Q70 2 50 0H42Q35 7 35 11Q37 38 48 46H62Q132 49 164 96Q170 102 345 401T523 704Q530 716 547 716H555H572Q578 707 578 706L606 383Q634 60 636 57Q641 46 701 46Q726 46 726 36Q726 34 723 22Q720 7 718 4T704 0Q701 0 690 0T651 1T578 2Q484 2 455 0H443Q437 6 437 9T439 27Q443 40 445 43L449 46H469Q523 49 533 63L521 213H283L249 155Q208 86 208 74ZM516 260Q516 271 504 416T490 562L463 519Q447 492 400 412L310 260L413 259Q516 259 516 260Z"></path></g><g data-mml-node="mi" transform="translate(40857.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">为</text></g><g data-mml-node="mi" transform="translate(41857.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">滤</text></g><g data-mml-node="mi" transform="translate(42857.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">波</text></g><g data-mml-node="mi" transform="translate(43857.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">窗</text></g><g data-mml-node="mi" transform="translate(44857.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">口</text></g><g data-mml-node="mi" transform="translate(45857.3,0)"><text data-variant="italic" transform="scale(1,-1)" font-size="884px" font-family="serif" font-style="italic">，</text></g><g data-mml-node="mi" transform="translate(46857.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">大</text></g><g data-mml-node="mi" transform="translate(47857.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">小</text></g><g data-mml-node="mi" transform="translate(48857.3,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">为</text></g><g data-mml-node="mi" transform="translate(49857.3,0)"><path data-c="1D458" d="M121 647Q121 657 125 670T137 683Q138 683 209 688T282 694Q294 694 294 686Q294 679 244 477Q194 279 194 272Q213 282 223 291Q247 309 292 354T362 415Q402 442 438 442Q468 442 485 423T503 369Q503 344 496 327T477 302T456 291T438 288Q418 288 406 299T394 328Q394 353 410 369T442 390L458 393Q446 405 434 405H430Q398 402 367 380T294 316T228 255Q230 254 243 252T267 246T293 238T320 224T342 206T359 180T365 147Q365 130 360 106T354 66Q354 26 381 26Q429 26 459 145Q461 153 479 153H483Q499 153 499 144Q499 139 496 130Q455 -11 378 -11Q333 -11 305 15T277 90Q277 108 280 121T283 145Q283 167 269 183T234 206T200 217T182 220H180Q168 178 159 139T145 81T136 44T129 20T122 7T111 -2Q98 -11 83 -11Q66 -11 57 -1T48 16Q48 26 85 176T158 471L195 616Q196 629 188 632T149 637H144Q134 637 131 637T124 640T121 647Z"></path></g><g data-mml-node="mo" transform="translate(50600.6,0)"><path data-c="2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path></g><g data-mml-node="mi" transform="translate(51322.8,0)"><path data-c="1D459" d="M117 59Q117 26 142 26Q179 26 205 131Q211 151 215 152Q217 153 225 153H229Q238 153 241 153T246 151T248 144Q247 138 245 128T234 90T214 43T183 6T137 -11Q101 -11 70 11T38 85Q38 97 39 102L104 360Q167 615 167 623Q167 626 166 628T162 632T157 634T149 635T141 636T132 637T122 637Q112 637 109 637T101 638T95 641T94 647Q94 649 96 661Q101 680 107 682T179 688Q194 689 213 690T243 693T254 694Q266 694 266 686Q266 675 193 386T118 83Q118 81 118 75T117 65V59Z"></path></g></g></g></svg></mjx-container></p>
+<h3 id="1-2-中值滤波算例">1.2 中值滤波算例</h3>
+<p>例如取<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="4.399ex" height="1.554ex" role="img" focusable="false" viewBox="0 -665 1944.4 687"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><path data-c="33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path></g><g data-mml-node="mo" transform="translate(722.2,0)"><path data-c="2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path></g><g data-mml-node="mn" transform="translate(1444.4,0)"><path data-c="33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path></g></g></g></svg></mjx-container> 方型滤波窗口</p>
+<p><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.452ex;" xmlns="http://www.w3.org/2000/svg" width="104.525ex" height="2.149ex" role="img" focusable="false" viewBox="0 -750 46200 950"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="merror" data-mjx-error="Missing \left or extra \right" title="Missing \left or extra \right"><rect data-background="true" width="46200" height="950" y="-200"></rect><title>Missing \left or extra \right</title><g data-mml-node="mtext" style="font-family: serif;"><text data-variant="-explicitFont" transform="scale(1,-1)" font-size="884px">\left[\begin{matrix}212&amp;200&amp;198\206&amp;202&amp;201\208&amp;205&amp;207\\end{matrix} \right] </text></g></g></g></g></svg></mjx-container></p>
+<p>从小到大排列，取中间值：198, 200, 201, 202, 205, 206, 207, 208, 212，取205代替中间值202之后的矩阵为：</p>
+<p><mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.452ex;" xmlns="http://www.w3.org/2000/svg" width="101.81ex" height="2.149ex" role="img" focusable="false" viewBox="0 -750 45000 950"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="merror" data-mjx-error="Missing \left or extra \right" title="Missing \left or extra \right"><rect data-background="true" width="45000" height="950" y="-200"></rect><title>Missing \left or extra \right</title><g data-mml-node="mtext" style="font-family: serif;"><text data-variant="-explicitFont" transform="scale(1,-1)" font-size="884px">\left[\begin{matrix}212&amp;200&amp;198\206&amp;205&amp;201\208&amp;205&amp;207\\end{matrix}\right]</text></g></g></g></g></svg></mjx-container></p>
+<p>滤波窗口有多种形状：</p>
+<p><img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/FPGA_filter_01" alt="image-20220706014750018"></p>
+<h3 id="1-3-中值滤波实例">1.3 中值滤波实例</h3>
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/FPGA_filter_02" alt="image-20220706014849391" style="zoom:50%;">
+<img src="https://raw.githubusercontent.com/wyp7788/blog_picture/main/blog_picture/FPGA_filter_03" alt="image-20220706014916992" style="zoom: 50%;">
+<h3 id="2-4-中值滤波特性总结">2.4 中值滤波特性总结</h3>
+<ul>
+<li>
+<p>对离散阶跃信号、斜声信号不产生作用，对点状噪声和干扰脉冲有良好的抑制作用。</p>
+</li>
+<li>
+<p>能保持图像边缘，使原始图像不产生模糊。</p>
+</li>
+<li>
+<p>缺点</p>
+<ul>
+<li>对高斯噪声无能为力</li>
+<li>计算比较费时</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-5-FPGA-实现图像中值滤波">2.5 FPGA 实现图像中值滤波</h3>
+<p>中值滤波实现的核心就是对数组进行排序，Verilog实现三个数的排序代码如下：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> mid_filter_sort(</span><br><span class="line">    <span class="keyword">input</span> clk,</span><br><span class="line">    <span class="keyword">input</span> rst_n,</span><br><span class="line">    <span class="keyword">input</span> [<span class="number">7</span>:<span class="number">0</span>] data1, data2, data3,</span><br><span class="line">    <span class="keyword">output</span> <span class="keyword">reg</span> [<span class="number">7</span>:<span class="number">0</span>] max, mid, min</span><br><span class="line">);</span><br><span class="line">    <span class="keyword">always</span> @(<span class="keyword">posedge</span> clk, <span class="keyword">negedge</span> rst_n) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span>(!rst_n) <span class="keyword">begin</span></span><br><span class="line">            max &lt;= <span class="number">0</span>;</span><br><span class="line">            mid &lt;= <span class="number">0</span>;</span><br><span class="line">            min &lt;= <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">end</span> <span class="keyword">else</span> <span class="keyword">begin</span></span><br><span class="line">            <span class="comment">// max</span></span><br><span class="line">            <span class="keyword">if</span>(data1 &gt;= data2 &amp;&amp; data1 &gt;= data3)</span><br><span class="line">                max &lt;= data1;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(data2 &gt;= data1 &amp;&amp; data2 &gt;= data3)</span><br><span class="line">                max &lt;= data2;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                max &lt;= data3;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// mid</span></span><br><span class="line">            <span class="keyword">if</span>((data1 &gt;= data2 &amp;&amp; data1 &lt;= data3) || (data1 &gt;= data3 &amp;&amp; data1 &lt;= data2))</span><br><span class="line">                mid &lt;= data1;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>((data2 &gt;= data1 &amp;&amp; data2 &lt;= data3) || (data2 &gt;= data3 &amp;&amp; data2 &lt;= data1))</span><br><span class="line">                mid &lt;= data2;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                mid &lt;= data3;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// min</span></span><br><span class="line">            <span class="keyword">if</span>(data1 &lt;= data2 &amp;&amp; data1 &lt;= data3)</span><br><span class="line">                min &lt;= data1;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(data2 &lt;= data1 &amp;&amp; data2 &lt;= data3)</span><br><span class="line">                min &lt;= data2;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                min &lt;= data3;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+<p>中值滤波是对滤波矩阵进行排序，获取排序矩阵的Verilog代码为：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> filter_3x3(</span><br><span class="line">    <span class="keyword">input</span> clk,</span><br><span class="line">    <span class="keyword">input</span> rst_n,</span><br><span class="line"></span><br><span class="line">    <span class="keyword">input</span> i_Valid,</span><br><span class="line">    <span class="keyword">input</span> [<span class="number">7</span>:<span class="number">0</span>] i_Data,</span><br><span class="line"></span><br><span class="line">    <span class="keyword">output</span> o_Valid,</span><br><span class="line">    <span class="keyword">output</span> <span class="keyword">reg</span> [<span class="number">7</span>:<span class="number">0</span>] o_Data_11, o_Data_12, o_Data_13,</span><br><span class="line">    <span class="keyword">output</span> <span class="keyword">reg</span> [<span class="number">7</span>:<span class="number">0</span>] o_Data_21, o_Data_22, o_Data_23,</span><br><span class="line">    <span class="keyword">output</span> <span class="keyword">reg</span> [<span class="number">7</span>:<span class="number">0</span>] o_Data_31, o_Data_32, o_Data_33</span><br><span class="line">);</span><br><span class="line">    <span class="keyword">reg</span> [<span class="number">7</span>:<span class="number">0</span>]  row3;</span><br><span class="line">    <span class="keyword">wire</span> [<span class="number">7</span>:<span class="number">0</span>] row2;</span><br><span class="line">    <span class="keyword">wire</span> [<span class="number">7</span>:<span class="number">0</span>] row1;</span><br><span class="line">    <span class="keyword">reg</span> [<span class="number">1</span>:<span class="number">0</span>] Valid_shift;</span><br><span class="line">    </span><br><span class="line"> line_shift_ram inst_line_shift_ram(</span><br><span class="line">        <span class="variable">.clock</span>    (clk),</span><br><span class="line">        <span class="variable">.clken</span>    (iValid),</span><br><span class="line">        <span class="variable">.shiftin</span>  (row3_data),</span><br><span class="line">        <span class="variable">.taps0x</span>   (row2_data),</span><br><span class="line">        <span class="variable">.taps1x</span>   (row1_data),</span><br><span class="line">        <span class="variable">.shiftout</span> ()</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将输入数据寄存作为窗口第三行起始数据，同时也作为行缓存的输入</span></span><br><span class="line">    <span class="keyword">always</span> @(<span class="keyword">posedge</span> clk, <span class="keyword">negedge</span> rst_n) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span>(!rst_n)</span><br><span class="line">            row3_data &lt;= <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(iValid)</span><br><span class="line">            row3_data &lt;= iData;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取3x3卷积模板</span></span><br><span class="line">    <span class="keyword">always</span> @(<span class="keyword">posedge</span> clk, <span class="keyword">negedge</span> rst_n) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span>(!rst_n) <span class="keyword">begin</span></span><br><span class="line">            {oData_11, oData_12, oData_13} &lt;= <span class="number">3'b000</span>;</span><br><span class="line">            {oData_21, oData_22, oData_23} &lt;= <span class="number">3'b000</span>;</span><br><span class="line">            {oData_31, oData_32, oData_33} &lt;= <span class="number">3'b000</span>;</span><br><span class="line">        <span class="keyword">end</span> <span class="keyword">else</span> <span class="keyword">if</span>(iValid) <span class="keyword">begin</span></span><br><span class="line">            {oData_11, oData_12, oData_13} &lt;= {oData_12, oData_13, row1_data};</span><br><span class="line">            {oData_21, oData_22, oData_23} &lt;= {oData_22, oData_23, row2_data};</span><br><span class="line">            {oData_31, oData_32, oData_33} &lt;= {oData_32, oData_33, row3_data};</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// iValid打两拍输出</span></span><br><span class="line">    <span class="keyword">always</span> @(<span class="keyword">posedge</span> clk, <span class="keyword">negedge</span> rst_n) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span>(!rst_n)</span><br><span class="line">            Valid_shift &lt;=  <span class="number">2'b00</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            Valid_shift &lt;= {Valid_shift[<span class="number">0</span>], iValid};</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">assign</span> oValid = Valid_shift[<span class="number">1</span>];</span><br><span class="line"><span class="keyword">endmodule</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>项目中值滤波实现：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  Y方向延时2行  X方向延时5个CLK，</span></span><br><span class="line"><span class="comment">  即H_Cnt=100,P_Cnt=100的数据要在H_Cnt=102,P_Cnt=105时才能得到结果</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">module</span> MEDIAN_FILTER(</span><br><span class="line">	<span class="keyword">input</span>			ClkIn,</span><br><span class="line">    <span class="keyword">input</span> [<span class="number">15</span>:<span class="number">0</span>]	DataIn,</span><br><span class="line">    <span class="keyword">output</span>[<span class="number">15</span>:<span class="number">0</span>]	DataO,</span><br><span class="line">    <span class="keyword">input</span> [<span class="number">9</span>:<span class="number">0</span>]		P_Cnt,</span><br><span class="line">    <span class="keyword">input</span> [<span class="number">9</span>:<span class="number">0</span>]		H_Cnt,</span><br><span class="line">	<span class="keyword">input</span>			VREF,</span><br><span class="line">	<span class="keyword">input</span>			HREF</span><br><span class="line">				);  </span><br><span class="line"></span><br><span class="line"><span class="keyword">wire</span> [<span class="number">15</span>:<span class="number">0</span>]  DataIn02,DataIn03;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">15</span>:<span class="number">0</span>]	a00,a01,a02,a10,a11,a12,a20,a21,a22;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">15</span>:<span class="number">0</span>]	b00,b01,b02,b10,b11,b12,b20,b21,b22;</span><br><span class="line">    </span><br><span class="line">D_Array D_ROW01_1(<span class="variable">.ClkIn</span>(ClkIn),<span class="variable">.ImgIn</span>(DataIn),<span class="variable">.a0</span>(b00),<span class="variable">.a1</span>(b01),<span class="variable">.a2</span>(b02));</span><br><span class="line">D_Array D_ROW02_2(<span class="variable">.ClkIn</span>(ClkIn),<span class="variable">.ImgIn</span>(DataIn02),<span class="variable">.a0</span>(b10),<span class="variable">.a1</span>(b11),<span class="variable">.a2</span>(b12));</span><br><span class="line">D_Array D_ROW03_3(<span class="variable">.ClkIn</span>(ClkIn),<span class="variable">.ImgIn</span>(DataIn03),<span class="variable">.a0</span>(b20),<span class="variable">.a1</span>(b21),<span class="variable">.a2</span>(b22));</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span>	a00=<span class="number">'d65535</span>;</span><br><span class="line"><span class="keyword">assign</span>	a01=b01;</span><br><span class="line"><span class="keyword">assign</span>	a02=<span class="number">'d0</span>;</span><br><span class="line"><span class="keyword">assign</span>	a10=b10;</span><br><span class="line"><span class="keyword">assign</span>	a11=b11;</span><br><span class="line"><span class="keyword">assign</span>	a12=b12;</span><br><span class="line"><span class="keyword">assign</span>	a20=<span class="number">'d0</span>;</span><br><span class="line"><span class="keyword">assign</span>	a21=b21;</span><br><span class="line"><span class="keyword">assign</span>	a22=<span class="number">'d65535</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">parameter</span> [<span class="number">7</span>:<span class="number">0</span>] n=<span class="number">2</span>;</span><br><span class="line">		</span><br><span class="line"><span class="keyword">wire</span> rdclk,wrclk;</span><br><span class="line"><span class="keyword">assign</span> rdclk=ClkIn;</span><br><span class="line"><span class="keyword">assign</span> wrclk=ClkIn;	</span><br><span class="line"></span><br><span class="line"><span class="keyword">wire</span> HREF_RD,HREF_WR;</span><br><span class="line"><span class="keyword">reg</span>  HREF_TMP1,HREF_TMP2;</span><br><span class="line"><span class="keyword">assign</span> HREF_RD=HREF_TMP1;</span><br><span class="line"><span class="keyword">assign</span> HREF_WR=HREF_TMP2;</span><br><span class="line">                                               </span><br><span class="line"><span class="keyword">always</span>@(<span class="keyword">posedge</span> ClkIn)</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line"> HREF_TMP1&lt;=HREF;</span><br><span class="line"> HREF_TMP2&lt;=HREF_TMP1;</span><br><span class="line"><span class="keyword">end</span>		</span><br><span class="line">	</span><br><span class="line"><span class="keyword">wire</span> rdreq01,wrreq01;</span><br><span class="line">FIFO720 ROW01_1(</span><br><span class="line">	<span class="variable">.aclr</span>(!VREF),</span><br><span class="line">	<span class="variable">.data</span>(DataIn),</span><br><span class="line">	<span class="variable">.rdclk</span>(rdclk),</span><br><span class="line">	<span class="variable">.rdreq</span>(rdreq01),</span><br><span class="line">	<span class="variable">.wrclk</span>(wrclk),</span><br><span class="line">	<span class="variable">.wrreq</span>(wrreq01),</span><br><span class="line">	<span class="variable">.q</span>(DataIn02)</span><br><span class="line">	);</span><br><span class="line"><span class="keyword">assign</span> rdreq01=(H_Cnt&gt;=n+<span class="number">1</span>)?HREF_RD:<span class="number">1'b0</span>;</span><br><span class="line"><span class="keyword">assign</span> wrreq01=(H_Cnt&gt;=n)?HREF_WR:<span class="number">1'b0</span>;</span><br><span class="line">	</span><br><span class="line"><span class="keyword">wire</span> rdreq02,wrreq02;</span><br><span class="line">FIFO720 ROW02_2(</span><br><span class="line">	<span class="variable">.aclr</span>(!VREF),</span><br><span class="line">	<span class="variable">.data</span>(DataIn02),</span><br><span class="line">	<span class="variable">.rdclk</span>(rdclk),</span><br><span class="line">	<span class="variable">.rdreq</span>(rdreq02),</span><br><span class="line">	<span class="variable">.wrclk</span>(wrclk),</span><br><span class="line">	<span class="variable">.wrreq</span>(wrreq02),</span><br><span class="line">	<span class="variable">.q</span>(DataIn03)</span><br><span class="line">	);</span><br><span class="line"><span class="keyword">assign</span> rdreq02=(H_Cnt&gt;=n+<span class="number">2</span>)?HREF_RD:<span class="number">1'b0</span>;</span><br><span class="line"><span class="keyword">assign</span> wrreq02=(H_Cnt&gt;=n+<span class="number">1</span>)?HREF_WR:<span class="number">1'b0</span>;	</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//=================================</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//----------------------分三组排序--------------------------</span></span><br><span class="line"><span class="comment">//--------------------------------</span></span><br><span class="line"><span class="keyword">wire</span> ageb00_01;</span><br><span class="line">COMPARE COMP_INT0(</span><br><span class="line">	<span class="variable">.dataa</span>(a00),</span><br><span class="line">	<span class="variable">.datab</span>(a01),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb00_01));</span><br><span class="line"><span class="keyword">wire</span> ageb00_02;</span><br><span class="line">COMPARE COMP_INT1(</span><br><span class="line">	<span class="variable">.dataa</span>(a00),</span><br><span class="line">	<span class="variable">.datab</span>(a02),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb00_02));</span><br><span class="line"><span class="keyword">wire</span> ageb01_02;</span><br><span class="line">COMPARE COMP_INT2(</span><br><span class="line">	<span class="variable">.dataa</span>(a01),</span><br><span class="line">	<span class="variable">.datab</span>(a02),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb01_02));</span><br><span class="line"><span class="comment">//--------------------------------</span></span><br><span class="line"><span class="keyword">wire</span> ageb10_11;</span><br><span class="line">COMPARE COMP_INT3(</span><br><span class="line">	<span class="variable">.dataa</span>(a10),</span><br><span class="line">	<span class="variable">.datab</span>(a11),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb10_11));</span><br><span class="line"><span class="keyword">wire</span> ageb10_12;</span><br><span class="line">COMPARE COMP_INT4(</span><br><span class="line">	<span class="variable">.dataa</span>(a10),</span><br><span class="line">	<span class="variable">.datab</span>(a12),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb10_12));</span><br><span class="line"><span class="keyword">wire</span> ageb11_12;</span><br><span class="line">COMPARE COMP_INT5(</span><br><span class="line">	<span class="variable">.dataa</span>(a11),</span><br><span class="line">	<span class="variable">.datab</span>(a12),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb11_12));	</span><br><span class="line"><span class="comment">//--------------------------------</span></span><br><span class="line"><span class="keyword">wire</span> ageb20_21;</span><br><span class="line">COMPARE COMP_INT6(</span><br><span class="line">	<span class="variable">.dataa</span>(a20),</span><br><span class="line">	<span class="variable">.datab</span>(a21),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb20_21));</span><br><span class="line"><span class="keyword">wire</span> ageb20_22;</span><br><span class="line">COMPARE COMP_INT7(</span><br><span class="line">	<span class="variable">.dataa</span>(a20),</span><br><span class="line">	<span class="variable">.datab</span>(a22),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb20_22));</span><br><span class="line"><span class="keyword">wire</span> ageb21_22;</span><br><span class="line">COMPARE COMP_INT8(</span><br><span class="line">	<span class="variable">.dataa</span>(a21),</span><br><span class="line">	<span class="variable">.datab</span>(a22),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb21_22));</span><br><span class="line">	</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] max0,med0,min0;	</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] max1,med1,min1;</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] max2,med2,min2;</span><br><span class="line"><span class="keyword">always</span>@(<span class="keyword">posedge</span> ClkIn)</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line"><span class="keyword">case</span>({ageb00_01,ageb00_02,ageb01_02})</span><br><span class="line"><span class="number">3'b000</span> : <span class="keyword">begin</span> max0&lt;=a02; med0&lt;=a01; min0&lt;=a00; <span class="keyword">end</span><span class="comment">//a00&lt;a01  a00&lt;a02   a01&lt;a02  &lt;==&gt; a00&lt;a01&lt;a02</span></span><br><span class="line"><span class="number">3'b001</span> : <span class="keyword">begin</span> max0&lt;=a01; med0&lt;=a02; min0&lt;=a00; <span class="keyword">end</span><span class="comment">//a00&lt;a01  a00&lt;a02   a01&gt;=a02 &lt;==&gt; a00&lt;a02&lt;=a01</span></span><br><span class="line"><span class="number">3'b010</span> : <span class="keyword">begin</span> max0&lt;=max0; med0&lt;=med0; min0&lt;=min0; <span class="keyword">end</span><span class="comment">//a00&lt;a01  a00&gt;=a02  a01&lt;a02  &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b011</span> : <span class="keyword">begin</span> max0&lt;=a01; med0&lt;=a00; min0&lt;=a02; <span class="keyword">end</span><span class="comment">//a00&lt;a01  a00&gt;=a02  a01&gt;=a02 &lt;==&gt; a02&lt;=a00&lt;a01</span></span><br><span class="line"><span class="number">3'b100</span> : <span class="keyword">begin</span> max0&lt;=a02; med0&lt;=a00; min0&lt;=a01; <span class="keyword">end</span><span class="comment">//a00&gt;=a01 a00&lt;a02   a01&lt;a02  &lt;==&gt; a01&lt;=a00&lt;a02</span></span><br><span class="line"><span class="number">3'b101</span> : <span class="keyword">begin</span> max0&lt;=max0; med0&lt;=med0; min0&lt;=min0; <span class="keyword">end</span><span class="comment">//a00&gt;=a01 a00&lt;a02   a01&gt;=a02 &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b110</span> : <span class="keyword">begin</span> max0&lt;=a00; med0&lt;=a02; min0&lt;=a01; <span class="keyword">end</span><span class="comment">//a00&gt;=a01 a00&gt;=a02  a01&lt;a02  &lt;==&gt; a01&lt;a02&lt;=a00</span></span><br><span class="line"><span class="number">3'b111</span> : <span class="keyword">begin</span> max0&lt;=a00; med0&lt;=a01; min0&lt;=a02; <span class="keyword">end</span><span class="comment">//a00&gt;=a01 a00&gt;=a02  a01&gt;=a02 &lt;==&gt; a02&lt;=a01&lt;=a00</span></span><br><span class="line"><span class="keyword">default</span>: <span class="keyword">begin</span> max0&lt;=max0; med0&lt;=med0; min0&lt;=min0; <span class="keyword">end</span></span><br><span class="line"><span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">case</span>({ageb10_11,ageb10_12,ageb11_12})</span><br><span class="line"><span class="number">3'b000</span> : <span class="keyword">begin</span> max1&lt;=a12; med1&lt;=a11; min1&lt;=a10; <span class="keyword">end</span><span class="comment">//a10&lt;a11  a10&lt;a12   a11&lt;a12  &lt;==&gt; a10&lt;a11&lt;a12</span></span><br><span class="line"><span class="number">3'b001</span> : <span class="keyword">begin</span> max1&lt;=a11; med1&lt;=a12; min1&lt;=a10; <span class="keyword">end</span><span class="comment">//a10&lt;a11  a10&lt;a12   a11&gt;=a12 &lt;==&gt; a10&lt;a12&lt;=a11</span></span><br><span class="line"><span class="number">3'b010</span> : <span class="keyword">begin</span> max1&lt;=max1; med1&lt;=med1; min1&lt;=min1; <span class="keyword">end</span><span class="comment">//a10&lt;a11  a10&gt;=a12  a11&lt;a12  &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b011</span> : <span class="keyword">begin</span> max1&lt;=a11; med1&lt;=a10; min1&lt;=a12; <span class="keyword">end</span><span class="comment">//a10&lt;a11  a10&gt;=a12  a11&gt;=a12 &lt;==&gt; a12&lt;=a10&lt;a11</span></span><br><span class="line"><span class="number">3'b100</span> : <span class="keyword">begin</span> max1&lt;=a12; med1&lt;=a10; min1&lt;=a11; <span class="keyword">end</span><span class="comment">//a10&gt;=a11 a10&lt;a12   a11&lt;a12  &lt;==&gt; a11&lt;=a10&lt;a12</span></span><br><span class="line"><span class="number">3'b101</span> : <span class="keyword">begin</span> max1&lt;=max1; med1&lt;=med1; min1&lt;=min1; <span class="keyword">end</span><span class="comment">//a10&gt;=a11 a10&lt;a12   a11&gt;=a12 &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b110</span> : <span class="keyword">begin</span> max1&lt;=a10; med1&lt;=a12; min1&lt;=a11; <span class="keyword">end</span><span class="comment">//a10&gt;=a11 a10&gt;=a12  a11&lt;a12  &lt;==&gt; a11&lt;a12&lt;=a10</span></span><br><span class="line"><span class="number">3'b111</span> : <span class="keyword">begin</span> max1&lt;=a10; med1&lt;=a11; min1&lt;=a12; <span class="keyword">end</span><span class="comment">//a10&gt;=a11 a10&gt;=a12  a11&gt;=a12 &lt;==&gt; a12&lt;=a11&lt;=a10</span></span><br><span class="line"><span class="keyword">default</span>: <span class="keyword">begin</span> max1&lt;=max1; med1&lt;=med1; min1&lt;=min1; <span class="keyword">end</span></span><br><span class="line"><span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">case</span>({ageb20_21,ageb20_22,ageb21_22})</span><br><span class="line"><span class="number">3'b000</span> : <span class="keyword">begin</span> max2&lt;=a22; med2&lt;=a21; min2&lt;=a20; <span class="keyword">end</span><span class="comment">//a20&lt;a21  a20&lt;a22   a21&lt;a22  &lt;==&gt; a20&lt;a21&lt;a22</span></span><br><span class="line"><span class="number">3'b001</span> : <span class="keyword">begin</span> max2&lt;=a21; med2&lt;=a22; min2&lt;=a20; <span class="keyword">end</span><span class="comment">//a20&lt;a21  a20&lt;a22   a21&gt;=a22 &lt;==&gt; a20&lt;a22&lt;=a21</span></span><br><span class="line"><span class="number">3'b010</span> : <span class="keyword">begin</span> max2&lt;=max2; med2&lt;=med2; min2&lt;=min2; <span class="keyword">end</span><span class="comment">//a20&lt;a21  a20&gt;=a22  a21&lt;a22  &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b011</span> : <span class="keyword">begin</span> max2&lt;=a21; med2&lt;=a20; min2&lt;=a22; <span class="keyword">end</span><span class="comment">//a20&lt;a21  a20&gt;=a22  a21&gt;=a22 &lt;==&gt; a22&lt;=a20&lt;a21</span></span><br><span class="line"><span class="number">3'b100</span> : <span class="keyword">begin</span> max2&lt;=a22; med2&lt;=a20; min2&lt;=a21; <span class="keyword">end</span><span class="comment">//a20&gt;=a21 a20&lt;a22   a21&lt;a22  &lt;==&gt; a21&lt;=a20&lt;a22</span></span><br><span class="line"><span class="number">3'b101</span> : <span class="keyword">begin</span> max2&lt;=max2; med2&lt;=med2; min2&lt;=min2; <span class="keyword">end</span><span class="comment">//a20&gt;=a21 a20&lt;a22   a21&gt;=a22 &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b110</span> : <span class="keyword">begin</span> max2&lt;=a20; med2&lt;=a22; min2&lt;=a21; <span class="keyword">end</span><span class="comment">//a20&gt;=a21 a20&gt;=a22  a21&lt;a22  &lt;==&gt; a21&lt;a22&lt;=a20</span></span><br><span class="line"><span class="number">3'b111</span> : <span class="keyword">begin</span> max2&lt;=a20; med2&lt;=a21; min2&lt;=a22; <span class="keyword">end</span><span class="comment">//a20&gt;=a21 a20&gt;=a22  a21&gt;=a22 &lt;==&gt; a22&lt;=a21&lt;=a20</span></span><br><span class="line"><span class="keyword">default</span>: <span class="keyword">begin</span> max2&lt;=max2; med2&lt;=med2; min2&lt;=min2; <span class="keyword">end</span></span><br><span class="line"><span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="comment">//----------find out max_min med_med min_max---------</span></span><br><span class="line"><span class="comment">//--------------------------------</span></span><br><span class="line"><span class="keyword">wire</span> ageb_max_0_1;</span><br><span class="line">COMPARE COMP_INT10(</span><br><span class="line">	<span class="variable">.dataa</span>(max0),</span><br><span class="line">	<span class="variable">.datab</span>(max1),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb_max_0_1));</span><br><span class="line"><span class="keyword">wire</span> ageb_max_0_2;</span><br><span class="line">COMPARE COMP_INT11(</span><br><span class="line">	<span class="variable">.dataa</span>(max0),</span><br><span class="line">	<span class="variable">.datab</span>(max2),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb_max_0_2));</span><br><span class="line"><span class="keyword">wire</span> ageb_max_1_2;</span><br><span class="line">COMPARE COMP_INT12(</span><br><span class="line">	<span class="variable">.dataa</span>(max1),</span><br><span class="line">	<span class="variable">.datab</span>(max2),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb_max_1_2));</span><br><span class="line"><span class="comment">//--------------------------------</span></span><br><span class="line"><span class="keyword">wire</span> ageb_med_0_1;</span><br><span class="line">COMPARE COMP_INT13(</span><br><span class="line">	<span class="variable">.dataa</span>(med0),</span><br><span class="line">	<span class="variable">.datab</span>(med1),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb_med_0_1));</span><br><span class="line"><span class="keyword">wire</span> ageb_med_0_2;</span><br><span class="line">COMPARE COMP_INT14(</span><br><span class="line">	<span class="variable">.dataa</span>(med0),</span><br><span class="line">	<span class="variable">.datab</span>(med2),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb_med_0_2));</span><br><span class="line"><span class="keyword">wire</span> ageb_med_1_2;</span><br><span class="line">COMPARE COMP_INT15(</span><br><span class="line">	<span class="variable">.dataa</span>(med1),</span><br><span class="line">	<span class="variable">.datab</span>(med2),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb_med_1_2));</span><br><span class="line"><span class="comment">//--------------------------------</span></span><br><span class="line"><span class="keyword">wire</span> ageb_min_0_1;</span><br><span class="line">COMPARE COMP_INT16(</span><br><span class="line">	<span class="variable">.dataa</span>(min0),</span><br><span class="line">	<span class="variable">.datab</span>(min1),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb_min_0_1));</span><br><span class="line"><span class="keyword">wire</span> ageb_min_0_2;</span><br><span class="line">COMPARE COMP_INT17(</span><br><span class="line">	<span class="variable">.dataa</span>(min0),</span><br><span class="line">	<span class="variable">.datab</span>(min2),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb_min_0_2));</span><br><span class="line"><span class="keyword">wire</span> ageb_min_1_2;</span><br><span class="line">COMPARE COMP_INT18(</span><br><span class="line">	<span class="variable">.dataa</span>(min1),</span><br><span class="line">	<span class="variable">.datab</span>(min2),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb_min_1_2));</span><br><span class="line">	</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] max_min;	</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] med_med;</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] min_max;</span><br><span class="line"><span class="keyword">always</span>@(<span class="keyword">posedge</span> ClkIn)</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line"><span class="keyword">case</span>({ageb_max_0_1,ageb_max_0_2,ageb_max_1_2})</span><br><span class="line"><span class="number">3'b000</span> : max_min &lt;= max0; <span class="comment">//a00&lt;a01  a00&lt;a02   a01&lt;a02  &lt;==&gt; a00&lt;a01&lt;a02</span></span><br><span class="line"><span class="number">3'b001</span> : max_min &lt;= max0; <span class="comment">//a00&lt;a01  a00&lt;a02   a01&gt;=a02 &lt;==&gt; a00&lt;a02&lt;=a01</span></span><br><span class="line"><span class="number">3'b010</span> : max_min &lt;= max_min; <span class="comment">//a00&lt;a01  a00&gt;=a02  a01&lt;a02  &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b011</span> : max_min &lt;= max2; <span class="comment">//a00&lt;a01  a00&gt;=a02  a01&gt;=a02 &lt;==&gt; a02&lt;=a00&lt;a01</span></span><br><span class="line"><span class="number">3'b100</span> : max_min &lt;= max1; <span class="comment">//a00&gt;=a01 a00&lt;a02   a01&lt;a02  &lt;==&gt; a01&lt;=a00&lt;a02</span></span><br><span class="line"><span class="number">3'b101</span> : max_min &lt;= max_min; <span class="comment">//a00&gt;=a01 a00&lt;a02   a01&gt;=a02 &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b110</span> : max_min &lt;= max1; <span class="comment">//a00&gt;=a01 a00&gt;=a02  a01&lt;a02  &lt;==&gt; a01&lt;a02&lt;=a00</span></span><br><span class="line"><span class="number">3'b111</span> : max_min &lt;= max2; <span class="comment">//a00&gt;=a01 a00&gt;=a02  a01&gt;=a02 &lt;==&gt; a02&lt;=a01&lt;=a00</span></span><br><span class="line"><span class="keyword">default</span>: max_min &lt;= max_min; </span><br><span class="line"><span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">case</span>({ageb_med_0_1,ageb_med_0_2,ageb_med_1_2})</span><br><span class="line"><span class="number">3'b000</span> : med_med &lt;= med1; <span class="comment">//a00&lt;a01  a00&lt;a02   a01&lt;a02  &lt;==&gt; a00&lt;a01&lt;a02</span></span><br><span class="line"><span class="number">3'b001</span> : med_med &lt;= med2; <span class="comment">//a00&lt;a01  a00&lt;a02   a01&gt;=a02 &lt;==&gt; a00&lt;a02&lt;=a01</span></span><br><span class="line"><span class="number">3'b010</span> : med_med &lt;= med_med; <span class="comment">//a00&lt;a01  a00&gt;=a02  a01&lt;a02  &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b011</span> : med_med &lt;= med0; <span class="comment">//a00&lt;a01  a00&gt;=a02  a01&gt;=a02 &lt;==&gt; a02&lt;=a00&lt;a01</span></span><br><span class="line"><span class="number">3'b100</span> : med_med &lt;= med0; <span class="comment">//a00&gt;=a01 a00&lt;a02   a01&lt;a02  &lt;==&gt; a01&lt;=a00&lt;a02</span></span><br><span class="line"><span class="number">3'b101</span> : med_med &lt;= med_med; <span class="comment">//a00&gt;=a01 a00&lt;a02   a01&gt;=a02 &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b110</span> : med_med &lt;= med2; <span class="comment">//a00&gt;=a01 a00&gt;=a02  a01&lt;a02  &lt;==&gt; a01&lt;a02&lt;=a00</span></span><br><span class="line"><span class="number">3'b111</span> : med_med &lt;= med1; <span class="comment">//a00&gt;=a01 a00&gt;=a02  a01&gt;=a02 &lt;==&gt; a02&lt;=a01&lt;=a00</span></span><br><span class="line"><span class="keyword">default</span>: med_med &lt;= med_med; </span><br><span class="line"><span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">case</span>({ageb_min_0_1,ageb_min_0_2,ageb_min_1_2})</span><br><span class="line"><span class="number">3'b000</span> : min_max &lt;= min2; <span class="comment">//a00&lt;a01  a00&lt;a02   a01&lt;a02  &lt;==&gt; a00&lt;a01&lt;a02</span></span><br><span class="line"><span class="number">3'b001</span> : min_max &lt;= min1; <span class="comment">//a00&lt;a01  a00&lt;a02   a01&gt;=a02 &lt;==&gt; a00&lt;a02&lt;=a01</span></span><br><span class="line"><span class="number">3'b010</span> : min_max &lt;= min_max; <span class="comment">//a00&lt;a01  a00&gt;=a02  a01&lt;a02  &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b011</span> : min_max &lt;= min1; <span class="comment">//a00&lt;a01  a00&gt;=a02  a01&gt;=a02 &lt;==&gt; a02&lt;=a00&lt;a01</span></span><br><span class="line"><span class="number">3'b100</span> : min_max &lt;= min2; <span class="comment">//a00&gt;=a01 a00&lt;a02   a01&lt;a02  &lt;==&gt; a01&lt;=a00&lt;a02</span></span><br><span class="line"><span class="number">3'b101</span> : min_max &lt;= min_max; <span class="comment">//a00&gt;=a01 a00&lt;a02   a01&gt;=a02 &lt;==&gt; impossible</span></span><br><span class="line"><span class="number">3'b110</span> : min_max &lt;= min0; <span class="comment">//a00&gt;=a01 a00&gt;=a02  a01&lt;a02  &lt;==&gt; a01&lt;a02&lt;=a00</span></span><br><span class="line"><span class="number">3'b111</span> : min_max &lt;= min0; <span class="comment">//a00&gt;=a01 a00&gt;=a02  a01&gt;=a02 &lt;==&gt; a02&lt;=a01&lt;=a00</span></span><br><span class="line"><span class="keyword">default</span>: min_max &lt;= min_max; </span><br><span class="line"><span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//---------------------------------------------------</span></span><br><span class="line"><span class="keyword">wire</span> ageb0_1;</span><br><span class="line">COMPARE COMP_INTA(</span><br><span class="line">	<span class="variable">.dataa</span>(max_min),</span><br><span class="line">	<span class="variable">.datab</span>(med_med),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb0_1));</span><br><span class="line"><span class="keyword">wire</span> ageb0_2;</span><br><span class="line">COMPARE COMP_INTB(</span><br><span class="line">	<span class="variable">.dataa</span>(max_min),</span><br><span class="line">	<span class="variable">.datab</span>(min_max),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb0_2));</span><br><span class="line"><span class="keyword">wire</span> ageb1_2;</span><br><span class="line">COMPARE COMP_INTC(</span><br><span class="line">	<span class="variable">.dataa</span>(med_med),</span><br><span class="line">	<span class="variable">.datab</span>(min_max),</span><br><span class="line">	<span class="variable">.ageb</span>(ageb1_2));</span><br><span class="line"></span><br><span class="line"><span class="comment">/* reg [15:0] DataO;</span></span><br><span class="line"><span class="comment">always@(posedge ClkIn)</span></span><br><span class="line"><span class="comment">begin</span></span><br><span class="line"><span class="comment">case({ageb0_1,ageb0_2,ageb1_2})</span></span><br><span class="line"><span class="comment">3'b000 : DataO&lt;=med_med; //a00&lt;a01  a00&lt;a02   a01&lt;a02  &lt;==&gt; a00&lt;a01&lt;a02</span></span><br><span class="line"><span class="comment">3'b001 : DataO&lt;=min_max; //a00&lt;a01  a00&lt;a02   a01&gt;=a02 &lt;==&gt; a00&lt;a02&lt;=a01</span></span><br><span class="line"><span class="comment">3'b010 : DataO&lt;=DataO;//a00&lt;a01  a00&gt;=a02  a01&lt;a02  &lt;==&gt; impossible</span></span><br><span class="line"><span class="comment">3'b011 : DataO&lt;=max_min; //a00&lt;a01  a00&gt;=a02  a01&gt;=a02 &lt;==&gt; a02&lt;=a00&lt;a01</span></span><br><span class="line"><span class="comment">3'b100 : DataO&lt;=max_min; //a00&gt;=a01 a00&lt;a02   a01&lt;a02  &lt;==&gt; a01&lt;=a00&lt;a02</span></span><br><span class="line"><span class="comment">3'b101 : DataO&lt;=DataO;//a00&gt;=a01 a00&lt;a02   a01&gt;=a02 &lt;==&gt; impossible</span></span><br><span class="line"><span class="comment">3'b110 : DataO&lt;=min_max; //a00&gt;=a01 a00&gt;=a02  a01&lt;a02  &lt;==&gt; a01&lt;a02&lt;=a00</span></span><br><span class="line"><span class="comment">3'b111 : DataO&lt;=med_med; //a00&gt;=a01 a00&gt;=a02  a01&gt;=a02 &lt;==&gt; a02&lt;=a01&lt;=a00</span></span><br><span class="line"><span class="comment">default: DataO&lt;=DataO;</span></span><br><span class="line"><span class="comment">endcase</span></span><br><span class="line"><span class="comment">end */</span></span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] DataO_1;</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] DataO_2;</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] DataO_3;</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] DataO_4;</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] DataO_5;</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] DataO_6;</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">15</span>:<span class="number">0</span>] DataO;</span><br><span class="line"><span class="keyword">always</span>@(<span class="keyword">posedge</span> ClkIn)</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">DataO_1&lt;=DataIn;</span><br><span class="line">DataO_2&lt;=DataO_1;</span><br><span class="line">DataO_3&lt;=DataO_2;</span><br><span class="line">DataO_4&lt;=DataO_3;</span><br><span class="line">DataO_5&lt;=DataO_4;</span><br><span class="line">DataO_6&lt;=DataO_5;</span><br><span class="line"></span><br><span class="line">DataO&lt;=DataO_6;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FPGA/" rel="tag"># FPGA</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/03/11/%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%8A%A0%E6%B3%95%E5%99%A8/" rel="next" title="流水线加法器">
+                <i class="fa fa-chevron-left"></i> 流水线加法器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/03/18/FPGA%E5%AE%9E%E7%8E%B0%E5%9B%BE%E5%83%8F%E7%9B%B4%E6%96%B9%E5%9B%BE%E5%9D%87%E8%A1%A1%E5%8C%96/" rel="prev" title="FPGA实现图像直方图均衡化">
+                FPGA实现图像直方图均衡化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/taylor.jpg"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/wyp7788" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:ypwang0905@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.youtube.com/channel/UCdppnvLpN_BCR-ogLoUf9qQ" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/ypwang090509" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%9B%BE%E5%83%8F%E4%B8%AD%E5%80%BC%E6%BB%A4%E6%B3%A2"><span class="nav-number">1.</span> <span class="nav-text">1. 图像中值滤波</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E4%B8%AD%E5%80%BC%E6%BB%A4%E6%B3%A2%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 中值滤波基本思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E4%B8%AD%E5%80%BC%E6%BB%A4%E6%B3%A2%E7%AE%97%E4%BE%8B"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 中值滤波算例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E4%B8%AD%E5%80%BC%E6%BB%A4%E6%B3%A2%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 中值滤波实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E4%B8%AD%E5%80%BC%E6%BB%A4%E6%B3%A2%E7%89%B9%E6%80%A7%E6%80%BB%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">2.4 中值滤波特性总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-FPGA-%E5%AE%9E%E7%8E%B0%E5%9B%BE%E5%83%8F%E4%B8%AD%E5%80%BC%E6%BB%A4%E6%B3%A2"><span class="nav-number">1.5.</span> <span class="nav-text">2.5 FPGA 实现图像中值滤波</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yunpeng</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">8.8k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
+
